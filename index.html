@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ruang-belajar-lovha - Target IPB Ilmu Gizi</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f4fbf7;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- MOCK DATA AGENT STATUS ---
+        const initialAgents = [
+            { id: 1, name: "Teman Diskusi", role: "Menyemangati & Chat", status: "Siaga", color: "bg-emerald-500", desc: "Siap menjawab pertanyaan Lovha" },
+            { id: 2, name: "Pelatih Soal", role: "Membuat & Evaluasi Soal", status: "Aktif", color: "bg-emerald-500", desc: "Menyiapkan 10 soal Biologi" },
+            { id: 3, name: "Pelapor", role: "Laporan Mingguan", status: "Siaga", color: "bg-emerald-500", desc: "Laporan minggu ini terkirim" },
+            { id: 4, name: "Newsletter", role: "Update Info Seleksi IPB", status: "Siaga", color: "bg-amber-500", desc: "Menunggu jadwal update" },
+            { id: 5, name: "Teknisi Website", role: "Pemantau Error System", status: "Aktif", color: "bg-emerald-500", desc: "Sistem berjalan normal" }
+        ];
+
+        // --- MAIN APP COMPONENT ---
+        function App() {
+            const [activeTab, setActiveTab] = useState('home'); 
+            const [chatMessages, setChatMessages] = useState([
+                { sender: 'bot', text: 'Halo Lovha! Semangat pagi! Siap belajar Biologi & persiapan UTBK IPB hari ini?' }
+            ]);
+            const [inputMessage, setInputMessage] = useState('');
+            const [isThinking, setIsThinking] = useState(false);
+            const chatEndRef = useRef(null);
+
+            useEffect(() => {
+                chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, [chatMessages, isThinking]);
+
+            const handleSendMessage = (e) => {
+                e.preventDefault();
+                if (!inputMessage.trim()) return;
+
+                const newMsg = { sender: 'user', text: inputMessage };
+                setChatMessages(prev => [...prev, newMsg]);
+                setInputMessage('');
+                setIsThinking(true);
+
+                setTimeout(() => {
+                    let botReply = "Pertanyaan bagus, Lovha! Untuk topik ini, coba pahami dulu konsep dasarnya. Mau aku beri petunjuk langkah demi langkah atau mau coba kerjakan soal latihannya?";
+                    if (inputMessage.toLowerCase().includes("gizi")) {
+                        botReply = "Ilmu Gizi di IPB fokus pada gizi manusia, biokimia, serta pangan. Materi Biologi sel dan Kimia organik sangat penting untuk jalur ini!";
+                    } else if (inputMessage.toLowerCase().includes("utbk") || inputMessage.toLowerCase().includes("soal")) {
+                        botReply = "Untuk UTBK SNBT, fokus utama kita ada di Penalaran Umum, Literasi, dan Penalaran Matematika. Mau latihan 5 soal sekarang?";
+                    }
+                    setChatMessages(prev => [...prev, { sender: 'bot', text: botReply }]);
+                    setIsThinking(false);
+                }, 1200);
+            };
+
+            return (
+                <div className="max-w-md md:max-w-4xl mx-auto min-h-screen bg-white shadow-md flex flex-col">
+                    {/* HEADER */}
+                    <header className="bg-emerald-600 text-white p-4 sticky top-0 z-50 flex justify-between items-center shadow">
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-white text-emerald-700 font-bold flex items-center justify-center">
+                                🌱
+                            </div>
+                            <div>
+                                <h1 className="font-bold text-base leading-tight">ruang-belajar-lovha</h1>
+                                <p className="text-xs text-emerald-100">Target IPB University - Ilmu Gizi</p>
+                            </div>
+                        </div>
+                        <span className="text-xs bg-emerald-700 px-2.5 py-1 rounded-full font-medium text-emerald-100 border border-emerald-500">
+                            SNBT 2027
+                        </span>
+                    </header>
+
+                    {/* BODY CONTENT */}
+                    <main className="flex-1 p-4 pb-20">
+                        {activeTab === 'home' && (
+                            <div className="space-y-5">
+                                {/* Banner Sapaan */}
+                                <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-start gap-3">
+                                    <div className="text-3xl">🤖</div>
+                                    <div>
+                                        <h2 className="font-semibold text-emerald-900 text-sm">Halo Lovha, Semangat Pagi!</h2>
+                                        <p className="text-xs text-slate-600 mt-1">
+                                            Siap belajar Biologi hari ini? Teman Diskusi siap membantu memahami konsep sulit.
+                                        </p>
+                                        <button 
+                                            onClick={() => setActiveTab('chat')}
+                                            className="mt-3 text-xs bg-emerald-600 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-emerald-700 transition"
+                                        >
+                                            Tanya Teman Diskusi
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Target Hari Ini */}
+                                <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Target Lovha Hari Ini</h3>
+                                        <span className="text-xs text-emerald-600 font-medium">6 dari 10 selesai</span>
+                                    </div>
+                                    <p className="text-sm font-semibold text-slate-800 mb-2">10 Soal Biologi & 1 Esai Pendek</p>
+                                    <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                                        <div className="bg-emerald-500 h-full w-[60%] transition-all duration-500"></div>
+                                    </div>
+                                    <button 
+                                        onClick={() => setActiveTab('chat')}
+                                        className="w-full mt-4 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-sm font-semibold shadow-sm transition"
+                                    >
+                                        Lanjut Belajar
+                                    </button>
+                                </div>
+
+                                {/* Stat Ringkas */}
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
+                                        <p className="text-2xl font-bold text-emerald-600">7 Hari</p>
+                                        <p className="text-xs text-slate-500 font-medium mt-0.5">Belajar Berturut-turut</p>
+                                    </div>
+                                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
+                                        <p className="text-2xl font-bold text-amber-500">3 Lencana</p>
+                                        <p className="text-xs text-slate-500 font-medium mt-0.5">Pencapaian Baru</p>
+                                    </div>
+                                </div>
+
+                                {/* Peta Belajar */}
+                                <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Peta Belajar Mandiri</h3>
+                                    <div className="flex justify-between items-center relative px-2">
+                                        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-slate-200 z-0"></div>
+                                        
+                                        <div className="relative z-10 text-center">
+                                            <div className="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center mx-auto text-xs font-bold shadow">✓</div>
+                                            <p className="text-[11px] font-medium mt-1">Sel</p>
+                                        </div>
+                                        <div className="relative z-10 text-center">
+                                            <div className="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center mx-auto text-xs font-bold shadow ring-4 ring-emerald-100">Gizi</div>
+                                            <p className="text-[11px] font-bold text-emerald-700 mt-1">Gizi</p>
+                                        </div>
+                                        <div className="relative z-10 text-center">
+                                            <div className="w-9 h-9 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center mx-auto text-xs font-bold">🔒</div>
+                                            <p className="text-[11px] text-slate-400 mt-1">Genetika</p>
+                                        </div>
+                                        <div className="relative z-10 text-center">
+                                            <div className="w-9 h-9 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center mx-auto text-xs font-bold">🔒</div>
+                                            <p className="text-[11px] text-slate-400 mt-1">Ekologi</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'chat' && (
+                            <div className="flex flex-col h-[75vh]">
+                                <div className="flex-1 overflow-y-auto space-y-3 p-2 custom-scrollbar">
+                                    {chatMessages.map((msg, idx) => (
+                                        <div key={idx} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                            <div className={`max-w-[80%] p-3 rounded-2xl text-xs leading-relaxed ${
+                                                msg.sender === 'user' 
+                                                ? 'bg-emerald-600 text-white rounded-br-none' 
+                                                : 'bg-slate-100 text-slate-800 rounded-bl-none border border-slate-200'
+                                            }`}>
+                                                {msg.text}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {isThinking && (
+                                        <div className="flex justify-start">
+                                            <div className="bg-slate-100 p-3 rounded-2xl rounded-bl-none text-xs text-slate-400 animate-pulse">
+                                                Teman Diskusi sedang mengetik...
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div ref={chatEndRef} />
+                                </div>
+                                <form onSubmit={handleSendMessage} className="mt-2 flex gap-2 pt-2 border-t border-slate-100">
+                                    <input 
+                                        type="text" 
+                                        value={inputMessage}
+                                        onChange={(e) => setInputMessage(e.target.value)}
+                                        placeholder="Tanyakan soal Biologi, Gizi, atau UTBK..."
+                                        className="flex-1 text-xs border border-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:border-emerald-500"
+                                    />
+                                    <button type="submit" className="bg-emerald-600 text-white px-4 py-2.5 rounded-xl text-xs font-medium hover:bg-emerald-700">
+                                        Kirim
+                                    </button>
+                                </form>
+                            </div>
+                        )}
+
+                        {activeTab === 'dashboard' && (
+                            <div className="space-y-4">
+                                <h2 className="font-bold text-slate-800 text-sm">Dashboard Progres Belajar Lovha</h2>
+                                
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="bg-white border border-slate-200 p-3 rounded-xl">
+                                        <p className="text-xs text-slate-500">Skor Try Out Terakhir</p>
+                                        <p className="text-xl font-bold text-emerald-600 mt-1">78 / 100</p>
+                                    </div>
+                                    <div className="bg-white border border-slate-200 p-3 rounded-xl">
+                                        <p className="text-xs text-slate-500">Sisa Hari ke UTBK</p>
+                                        <p className="text-xl font-bold text-amber-600 mt-1">120 Hari</p>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white border border-slate-200 p-4 rounded-xl">
+                                    <h3 className="text-xs font-bold text-slate-700 mb-3">Topik Perlu Ditingkatkan</h3>
+                                    <div className="space-y-2 text-xs">
+                                        <div>
+                                            <div className="flex justify-between mb-1">
+                                                <span className="text-slate-600">Penalaran Matematika</span>
+                                                <span className="font-bold text-amber-600">55%</span>
+                                            </div>
+                                            <div className="w-full bg-slate-100 h-2 rounded-full">
+                                                <div className="bg-amber-500 h-2 rounded-full w-[55%]"></div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div className="flex justify-between mb-1">
+                                                <span className="text-slate-600">Kimia Organik</span>
+                                                <span className="font-bold text-emerald-600">70%</span>
+                                            </div>
+                                            <div className="w-full bg-slate-100 h-2 rounded-full">
+                                                <div className="bg-emerald-500 h-2 rounded-full w-[70%]"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'parent' && (
+                            <div className="space-y-4">
+                                <div className="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs text-amber-800">
+                                    🔒 <strong>Panel Kakak (Khusus Bang Alvin)</strong>
+                                    <p className="mt-1 text-[11px] text-amber-700">Status pengerjaan sistem dan pemantauan belajar Lovha secara real-time.</p>
+                                </div>
+
+                                <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Status Ruang Tim Agen</h3>
+                                
+                                <div className="space-y-2">
+                                    {initialAgents.map(agent => (
+                                        <div key={agent.id} className="bg-white border border-slate-200 p-3 rounded-xl flex items-center justify-between">
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`w-2 h-2 rounded-full ${agent.color}`}></span>
+                                                    <h4 className="text-xs font-bold text-slate-800">{agent.name}</h4>
+                                                </div>
+                                                <p className="text-[11px] text-slate-500 mt-0.5">{agent.desc}</p>
+                                            </div>
+                                            <span className="text-[10px] font-semibold bg-slate-100 text-slate-600 px-2 py-1 rounded">
+                                                {agent.status}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </main>
+
+                    {/* BOTTOM NAVIGATION */}
+                    <nav className="bg-white border-t border-slate-200 fixed bottom-0 left-0 right-0 max-w-md md:max-w-4xl mx-auto flex justify-around p-2 z-50">
+                        <button 
+                            onClick={() => setActiveTab('home')} 
+                            className={`flex flex-col items-center p-1 ${activeTab === 'home' ? 'text-emerald-600 font-bold' : 'text-slate-400'}`}
+                        >
+                            <span className="text-base">🏠</span>
+                            <span className="text-[10px] mt-0.5">Beranda</span>
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('chat')} 
+                            className={`flex flex-col items-center p-1 ${activeTab === 'chat' ? 'text-emerald-600 font-bold' : 'text-slate-400'}`}
+                        >
+                            <span className="text-base">💬</span>
+                            <span class="text-[10px] mt-0.5">Tutor AI</span>
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('dashboard')} 
+                            className={`flex flex-col items-center p-1 ${activeTab === 'dashboard' ? 'text-emerald-600 font-bold' : 'text-slate-400'}`}
+                        >
+                            <span className="text-base">📊</span>
+                            <span className="text-[10px] mt-0.5">Progres</span>
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('parent')} 
+                            className={`flex flex-col items-center p-1 ${activeTab === 'parent' ? 'text-emerald-600 font-bold' : 'text-slate-400'}`}
+                        >
+                            <span className="text-base">⚙️</span>
+                            <span className="text-[10px] mt-0.5">Panel Kakak</span>
+                        </button>
+                    </nav>
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
